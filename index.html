@@ -271,7 +271,19 @@
 	    height:40%;
 	  }
 	}  
-
+	  
+    @media(max-width:900px){
+	
+	  .main-container.verificando .panel:first-child{
+	
+	    height:70%;
+	  }
+	
+	  .main-container.verificando .panel:last-child{
+	
+	    height:30%;
+	  }
+	}
   </style>
 </head>
 
@@ -741,6 +753,9 @@ const respuestasOriginales = [
   // ======================================
 
   function verificar(){
+	document
+  .querySelector(".main-container")
+  .classList.add("verificando");  
 
     let correctas = 0;
 
@@ -845,6 +860,10 @@ const respuestasOriginales = [
 
   function reiniciar(){
 
+	  document
+    .querySelector(".main-container")
+    .classList.remove("verificando");
+	  
     generar();
 
     document
