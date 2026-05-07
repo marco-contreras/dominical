@@ -1,0 +1,846 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+
+  <title>Escuela Dominical</title>
+
+  <!-- Materialize -->
+  <link
+    rel="stylesheet"
+    href="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/css/materialize.min.css"
+  />
+
+  <style>
+
+    *{
+      box-sizing:border-box;
+    }
+
+    body{
+
+      margin:0;
+
+      background:#121212;
+
+      color:white;
+
+      font-family:Arial, Helvetica, sans-serif;
+
+      overflow:hidden;
+    }
+
+    .main-container{
+
+      display:flex;
+
+      gap:15px;
+
+      height:100vh;
+
+      padding:15px;
+
+      overflow:hidden;
+    }
+
+    .panel{
+
+      flex:1;
+
+      height:100%;
+
+      display:flex;
+    }
+
+    .panel .card{
+
+      width:100%;
+
+      margin:0;
+
+      display:flex;
+
+      flex-direction:column;
+
+      border-radius:18px;
+
+      background:#1e1e1e;
+    }
+
+    .panel .card-content{
+
+      display:flex;
+
+      flex-direction:column;
+
+      height:100%;
+    }
+
+    .card-title{
+
+      color:white !important;
+
+      font-weight:bold !important;
+
+      margin-bottom:15px !important;
+    }
+
+    .card-content-scroll{
+
+      flex:1;
+
+      overflow-y:auto;
+
+      padding-right:10px;
+    }
+
+    .question-item,
+    .answer-item{
+
+      margin-bottom:20px;
+
+      padding-bottom:15px;
+
+      border-bottom:1px solid #333;
+    }
+
+    .answer-letter{
+
+      font-size:24px;
+
+      font-weight:bold;
+
+      color:#64b5f6;
+
+      margin-bottom:10px;
+    }
+
+    .input-container{
+
+      margin-top:12px;
+    }
+
+    .input-letter{
+
+      width:70px !important;
+
+      height:55px !important;
+
+      border:none !important;
+
+      border-radius:12px !important;
+
+      background:#2b2b2b !important;
+
+      color:white !important;
+
+      text-align:center;
+
+      font-size:24px !important;
+
+      font-weight:bold;
+
+      text-transform:uppercase;
+
+      padding:0 !important;
+
+      margin:0 !important;
+
+      cursor:text;
+
+      transition:0.2s;
+    }
+
+    .input-letter:focus{
+
+      background:#3949ab !important;
+
+      box-shadow:0 0 0 2px #7986cb !important;
+    }
+
+    .buttons{
+
+      display:flex;
+
+      gap:10px;
+
+      margin-top:15px;
+
+      flex-wrap:wrap;
+    }
+
+    .btn{
+
+      border-radius:10px;
+    }
+
+    .resultado{
+
+      margin-top:15px;
+
+      background:#2a2a2a;
+
+      border-radius:14px;
+
+      padding:15px;
+
+      max-height:250px;
+
+      overflow-y:auto;
+    }
+
+    ul{
+
+      padding-left:20px;
+    }
+
+    strong{
+
+      color:#90caf9;
+    }
+
+    ::-webkit-scrollbar{
+
+      width:8px;
+    }
+
+    ::-webkit-scrollbar-track{
+
+      background:#1b1b1b;
+    }
+
+    ::-webkit-scrollbar-thumb{
+
+      background:#555;
+
+      border-radius:10px;
+    }
+
+    @media(max-width:900px){
+
+      .main-container{
+
+        flex-direction:column;
+      }
+
+      .panel{
+
+        height:50%;
+      }
+    }
+	
+	.inciso-usado{
+
+	  background:#ff9800 !important;
+
+	  color:white !important;
+
+	  padding:6px 12px;
+
+	  border-radius:10px;
+
+	  display:inline-block;
+
+	  text-decoration:line-through;
+	}
+
+	.respuesta-usada{
+
+	  opacity:0.65;
+
+	  transition:0.2s;
+	}
+
+  </style>
+</head>
+
+<body>
+
+  <div class="main-container">
+
+    <!-- PREGUNTAS -->
+    <div class="panel">
+
+      <div class="card">
+
+        <div class="card-content">
+
+          <span class="card-title">
+            Preguntas
+          </span>
+
+          <div
+            class="card-content-scroll"
+            id="questionsContainer">
+          </div>
+
+          <div class="buttons">
+
+            <button
+              class="btn blue"
+              onclick="verificar()">
+
+              Verificar
+
+            </button>
+
+            <button
+              class="btn orange"
+              onclick="reiniciar()">
+
+              Reiniciar
+
+            </button>
+
+          </div>
+
+          <div
+            class="resultado"
+            id="resultado">
+          </div>
+
+        </div>
+
+      </div>
+
+    </div>
+
+    <!-- RESPUESTAS -->
+    <div class="panel">
+
+      <div class="card">
+
+        <div class="card-content">
+
+          <span class="card-title">
+            Respuestas
+          </span>
+
+          <div
+            class="card-content-scroll"
+            id="answersContainer">
+          </div>
+
+        </div>
+
+      </div>
+
+    </div>
+
+  </div>
+
+  <script>
+
+const preguntas = [
+
+  "1.- De razones bíblicas por las cuales la escuela dominical “cumple una función evangelisticas en la iglesia.",
+  "2.- Indique diversas maneras de hallar alumnos en perspectiva para la escuela dominical.",
+  "3.- ¿Qué papel juega la atmosfera de la escuela dominical en alcanzar a los alumnos en perspectiva?",
+  "4,- ¿De qué manera puede beneficiar a un creyente un programa regular de ganar almas?",
+  "5.- ¿Por qué debe de haber un tiempo definido para salir a ganar almas?",
+  "6.-¿Cuál es el método más efectivo para adiestrar a los que salen a ganar almas?",
+  "7.- Indique cinco maneras de dar publicidad a la Escuela Dominical.",
+  "8.- ¿Cuáles dos fuentes de capacitación necesita un maestro de la Biblia?",
+  "9.- Nombre la triple responsabilidad de pastor que tiene el maestro de Escuela Dominical.",
+  "10.- ¿Cuál es el propósito principal de visitar a los alumnos que faltan a clase?",
+  "11- Anote tres tipos de cualidades que debe tener el maestro de Escuela Dominical, explicando por qué tiene importancia cada una ellas.",
+  "12- ¿Qué parte juega la personalidad en la enseñanza?",
+  "13.- Nombre tres metas que cada maestro debe esforzarse por alcanzar en la vida de cada uno de sus alumnos.",
+  "14- ¿Qué papel juega la Biblia en el plan de enseñanza?",
+  "15- Nombre tres aspectos de la tarea del maestro de Escuela Dominical.",
+  "16.- ¿Cuándo llega a ser exitoso un maestro de Escuela Dominical?",
+  "17.- ¿Cómo se reclutan los maestros potenciales?",
+  "18.- Menciona algunas de las ventajas de las clases de adiestramiento.",
+  "19.- Menciona las metas para las clases de adiestramiento.",
+  "20.- Mensione los diversos programas de adiestramiento de maestros:",
+  "21.- ¿Cómo iniciar un programa de adiestramiento?",
+  "22.- ¿Por qué son necesarias las normas de la Escuela Dominical?",
+  "23.- ¿Cuál debe ser la fuente que provee las normas de la Escuela Dominical?",
+  "24.- ¿Cuáles son los siete pasos a dar para mejorar la Escuela Dominical?",
+  "25.- ¿Cuál es uno de los mejores recursos para evaluar una Escuela Dominical?",
+  "26.- Anote las aptitudes requeridas para ser maestro de Escuela Dominical.",
+  "27.- ¿Qué planes debe tener una Escuela Dominical respecto a sus alumnos?",
+  "28.- ¿Cuáles son los ingredientes necesarios para que una Escuela Dominical progrese?",
+  "29.- Nombre varios de los métodos que usa la Escuela Dominical para su proyección evangelística.",
+  "30.- ¿Cuáles son las ventajas de contar con un Día de Dedicación del Maestro?",
+  "31.- ¿Qué es un plan de estudios?",
+  "32.- ¿Cuál es el propósito del plan de estudios?",
+  "33.- Enumere los cuatro tipos bien conocidos de planes de estudios.",
+  "34. ¿Qué factores deben tenerse en cuenta al confeccionar un plan de estudios para adultos?",
+  "35. Nombre tres importantes áreas que deben ser puestos de relieve en un plan de estudios de Escuela Dominical.",
+  "36. ¿Quién debe ser el responsable de escoger el plan de estudios y los materiales para ese plan?",
+  "37. ¿Cuáles son los criterios básicos para evaluar los materiales del plan de estudios?"
+];
+
+const respuestasOriginales = [
+
+  "A) Alcanzar al mundo.<br>B) El anhelo de Jesús para con las multitudes.",
+
+  "Búsquense alumnos en perspectiva en los registros de la Escuela Dominical.<br>Búsquense compañeros de los alumnos.",
+
+  "Si se planea alcanzar a los perdidos, asegúrese de que el aspecto del aula sea atractivo e invitador.<br>La misma debe decir: “¡Adelante!”",
+
+  "se requiere una campaña organizada para ayudar a la gente a comprometerse a alcanzar a los perdidos.",
+
+  "Cuando se deja el salir a ganar almas librado a la conveniencia, por lo habitual no se halla el tiempo adecuado.<br>Hay que establecer un tiempo fijo e insistir en que todos cumplan el horario establecido.",
+
+  "el adiestramiento más efectivo es el que se hace sobre la marcha.",
+
+  "El púlpito.<br>Carteles.<br>Volantes.<br>Avisos en los diarios.<br>Boletines de la iglesia.",
+
+  "Debe recibir el don de la enseñanza de manos de Dios.<br>Debe desarrollar su capacidad de enseñar.",
+
+  "1.- Guiar el rebaño.<br>2.- Alimentar al rebaño.<br>3.- Y proteger al rebaño.",
+
+  "El maestro de Escuela Dominical que visita hogares, hace alumnos que visitan la iglesia.",
+
+  "1.- Debe ser espiritual.<br>El maestro ha de estar dispuesto a apartar cierto tiempo todos los días para orar y meditar, a fin de poder crecer espiritualmente.<br><br>2.- Debe estar preparado desde el punto de vista educacional.<br>El maestro de Escuela Dominical que pretende tener éxito, debe estar adiestrado.<br><br>3.- Debe ser personalmente disciplinado.<br>Cuando los alumnos vean a Jesucristo en su maestro, querrán ser cómo él.<br>La personalidad también involucra una vida disciplinada.",
+
+  "el maestro necesita contar con la capacidad de inspirar a quienes enseña, y no puede hacerlo a menos que él mismo esté inspirado.",
+
+  "1) Ganar a todos los alumnos de su clase.<br>2) Lograr que todos sus alumnos crezcan espiritualmente.<br>3) Ayudar a sus alumnos a evangelizar a otros.",
+
+  "la Biblia es el libro de texto de la Escuela Dominical, su fuente de información.",
+
+  "1) Conocer a sus alumnos.<br>2) Prepararse en forma adecuada para enseñar la lección.<br>3) Atender los deberes aparte de la clase.",
+
+  "Llegará a ser un exitoso maestro a medida que crezca su deseo de utilizar su capacidad y su conocimiento.",
+
+  "Mediante encuestas.<br>La Escuela Bíblica de Vacaciones.<br>Los sermones y cultos especiales de dedicación para obreros.",
+
+  "Las clases de adiestramiento exhiben, en forma sistemática, las metas del maestro, sus calificaciones y sus obligaciones.",
+
+  "1.- Mejores maestros.<br>2.- Mejor instrucción.<br>3.- Mejor realización.<br>4.- Mejor matrícula y asistencia.<br>5.- Mayor número de almas ganadas.<br>6.- Mejores ofrendas.",
+
+  "Observación.<br>Internado.<br>La biblioteca de la Escuela Dominical.<br>La reunión de maestros de la Escuela Dominical.<br>Comida de obreros.<br>Convenciones y conferencias.<br>Escuelas nocturnas en institutos bíblicos locales.",
+
+  "El programa de adiestramiento generalmente lo inicia un entusiasta y progresista dirigente, que será el responsable de todas las fases de la preparación de maestros.",
+
+  "Se requieren normas de alto vuelo que sean un permanente desafío a toda Escuela Dominical a poner en juego su máximo potencial.",
+
+  "La palabra de DIOS.",
+
+  "1) Determinar el patrón.<br>2) Localizar las necesidades.<br>3) Investigar la necesidad.<br>4) Determinar las fuerzas.<br>5) Estudiar los registros.<br>6) Evaluar por observación.<br>7) Estrategia para el mejoramiento.",
+
+  "Uno de los mejores recursos para evaluar una Escuela Dominical, son sus registros pasados.",
+
+  "- Salvación personal.<br>- El don de enseñar (Efesios 4:11).<br>- Un cabal conocimiento de la Palabra de Dios (2 Timoteo 3:15-17).<br>- Un devocional diario consistente en oración y estudio de la Biblia.<br>- Una asistencia regular a los cultos de la iglesia (Hebreos 10:25).<br>- Capacidad administrativa y de planeamiento.<br>- Aptitud de líder y facultad para inspirar confianza.<br>- Visión, la capacidad de ver la tarea de manera objetiva, y de no desilusionarse (Filipenses 3:13, 14).<br>- Capacidad para expresarse y comunicarse.<br>- Una alegre y radiante personalidad.<br>- Un manifiesto amor por los niños.<br>- Paciencia.<br>- La capacidad y el deseo de aconsejar.<br>- Originalidad, capacidad para crear una interesante y variada clase.",
+
+  "La salvación de todo alumno componente de la Escuela Dominical.<br>Un programa sistemático para desarrollar un pleno crecimiento en la madurez cristiana.<br>Desarrollo de una vida social que honre al Señor.<br>Desarrollar una amistosa relación entre el hogar y la Escuela Dominical.",
+
+  "- Adiestramiento docente para los nuevos maestros y cursos de complementación para los veteranos.<br>- Promoción anual para crear un mayor interés e incentivo a todos los niveles de edades.<br>- Esfuerzo Evangelistico en el ámbito de la Escuela Dominical.<br>- Educación misionera para ampliar la visión de la totalidad de la iglesia.<br>- Oración.<br>- Un programa para alcanzar a nuevas familias.<br>- Creación de nuevos programas y departamentos, conforme vaya creciendo la Escuela Dominical.<br>- Una junta de Educación Cristiana para guiar el programa educacional integral de la iglesia.<br>- Adiestramiento en el uso de las ayudas visuales.<br>- Labor de extensión, como un ministerio en cárceles u hospitales, obras misioneras, grupos juveniles, Escuelas Dominicales de misiones y visitación.",
+
+  "- Un bien organizado programa de visitación.<br>- Un programa de seguimiento para los que faltan a las clases.<br>- Proveer medios de transporte para los que desean asistir, pero carecen de medios para hacerlo.<br>- Una bien organizada campaña publicitaria para que la iglesia y la comunidad se enteren de lo que ocurre en la Escuela Dominical.<br>- Se debe poner especial atención a la imagen total de la Escuela Dominical a los ojos del público.<br>- Un bien planificado calendario de la iglesia.",
+
+  "Una dedicación pública sitúa la enseñanza de la Escuela Dominical a su más alto nivel de expectativa.<br>Cuando los alumnos ven a sus maestros comprometer su devoción al convenio de la Escuela Dominical, comprenden que la enseñanza de la Escuela Dominical es más que una responsabilidad casual.",
+
+  "Es planificado para satisfacer las necesidades de los diversos grupos según edades en la Escuela Dominical, y es suficientemente comprensivo para proporcionar el estudio de la Biblia en su totalidad.",
+
+  "el plan de estudios proveerá los medios para guiar a los alumnos al conocimiento salvador de Cristo, y luego guiará al maestro cuando enseña a sus alumnos cómo crecer en cuanto al carácter, al servicio y al testimonio.",
+
+  "1) Cursos uniformes.<br>2) Cursos unificados.<br>3) Cursos departamentales.<br>4) Cursos Ajustados.",
+
+  "Al escoger para ellos un plan de estudios, los dirigentes no deben olvidar que esos estudiantes necesitan materiales que apliquen las verdades bíblicas a sus específicas necesidades y problemas.<br>Necesitan clases que los desafíen a dedicar su vida al servicio del Señor y de la iglesia.<br>Las siguientes son algunas de las posibilidades.",
+
+  "1) Sea Cristocéntrico<br>2) Esté fundamentado en la Biblia<br>3) Esté relacionado con el alumno",
+
+  "La Junta de Educación Cristiana o el pastor y el superintendente de la Escuela Dominical pueden tomar esa decisión.",
+
+  "1) Contenido Teológico<br>2) Contenido docente<br>3) Aspecto<br>4) Ayudas del Maestro<br>5) Ayudas del Alumno"
+];
+
+    function generarIncisos(cantidad){
+
+    const letras = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+
+    const resultado = [];
+
+    // A-Z
+    for(let i = 0; i < letras.length; i++){
+
+      resultado.push(letras[i]);
+    }
+
+    // AA, AB, AC...
+    let index = 0;
+
+    while(resultado.length < cantidad){
+
+      const primera =
+        letras[Math.floor(index / 26)];
+
+      const segunda =
+        letras[index % 26];
+
+      resultado.push(
+        primera + segunda
+      );
+
+      index++;
+    }
+
+    return resultado;
+  }
+
+  const letras =
+    generarIncisos(100);
+
+  let respuestasMezcladas = [];
+
+  let mapaCorrecto = {};
+
+  function shuffle(array){
+
+    return [...array]
+      .sort(() => Math.random() - 0.5);
+  }
+
+  function generar(){
+
+    const questionsContainer =
+      document.getElementById(
+        "questionsContainer"
+      );
+
+    const answersContainer =
+      document.getElementById(
+        "answersContainer"
+      );
+
+    questionsContainer.innerHTML = "";
+
+    answersContainer.innerHTML = "";
+
+    respuestasMezcladas = shuffle(
+
+      respuestasOriginales.map(
+        (texto, index) => ({
+
+          texto,
+
+          preguntaIndex:index
+        })
+      )
+    );
+
+    mapaCorrecto = {};
+
+    respuestasMezcladas.forEach(
+      (respuesta, index) => {
+
+        mapaCorrecto[
+          respuesta.preguntaIndex
+        ] = letras[index];
+      }
+    );
+
+    // =========================
+    // PREGUNTAS
+    // =========================
+
+    preguntas.forEach(
+      (pregunta, index) => {
+
+        const div =
+          document.createElement("div");
+
+        div.className =
+          "question-item";
+
+        div.innerHTML = `
+
+          <p>
+            <strong>
+              ${pregunta}
+            </strong>
+          </p>
+
+          <div class="input-container">
+
+            <input
+              type="text"
+              maxlength="2"
+              autocomplete="off"
+              class="input-letter"
+              id="respuesta-${index}"
+              oninput="validar(this)"
+            >
+
+          </div>
+        `;
+
+        questionsContainer
+          .appendChild(div);
+      }
+    );
+
+    // =========================
+    // RESPUESTAS
+    // =========================
+
+    respuestasMezcladas.forEach(
+      (respuesta, index) => {
+
+        const inciso =
+          letras[index];
+
+        const div =
+          document.createElement("div");
+
+        div.className =
+          "answer-item";
+
+        div.id =
+          `answer-item-${inciso}`;
+
+        div.innerHTML = `
+
+          <div
+            class="answer-letter"
+            id="inciso-${inciso}"
+          >
+
+            ${inciso}
+
+          </div>
+
+          <p>
+
+            ${respuesta.texto}
+
+          </p>
+        `;
+
+        answersContainer
+          .appendChild(div);
+      }
+    );
+
+    document.getElementById(
+      "resultado"
+    ).innerHTML = "";
+  }
+
+  // ======================================
+  // VALIDAR INPUT
+  // ======================================
+
+  function validar(input){
+
+    input.value = input.value
+      .toUpperCase()
+      .replace(/[^A-Z]/g,'');
+
+    if(input.value.length > 2){
+
+      input.value =
+        input.value.substring(0,2);
+    }
+
+    actualizarIncisosUsados();
+  }
+
+  // ======================================
+  // ACTUALIZAR COLORES DE INCISOS
+  // ======================================
+
+  function actualizarIncisosUsados(){
+
+    // limpiar todos
+
+    document
+      .querySelectorAll(".answer-letter")
+      .forEach(el => {
+
+        el.classList.remove(
+          "inciso-usado"
+        );
+      });
+
+    document
+      .querySelectorAll(".answer-item")
+      .forEach(el => {
+
+        el.classList.remove(
+          "respuesta-usada"
+        );
+      });
+
+    // obtener usados
+
+    const usados = [];
+
+    document
+      .querySelectorAll(".input-letter")
+      .forEach(input => {
+
+        const valor =
+          input.value
+            .trim()
+            .toUpperCase();
+
+        if(valor){
+
+          usados.push(valor);
+        }
+      });
+
+    // aplicar estilos
+
+    usados.forEach(inciso => {
+
+      const letra =
+        document.getElementById(
+          `inciso-${inciso}`
+        );
+
+      const item =
+        document.getElementById(
+          `answer-item-${inciso}`
+        );
+
+      if(letra){
+
+        letra.classList.add(
+          "inciso-usado"
+        );
+      }
+
+      if(item){
+
+        item.classList.add(
+          "respuesta-usada"
+        );
+      }
+    });
+  }
+
+  // ======================================
+  // VERIFICAR
+  // ======================================
+
+  function verificar(){
+
+    let correctas = 0;
+
+    let errores = "";
+
+    preguntas.forEach(
+      (pregunta, index) => {
+
+        const valor =
+          document
+            .getElementById(
+              `respuesta-${index}`
+            )
+            .value
+            .toUpperCase();
+
+        const correcta =
+          mapaCorrecto[index];
+
+        if(valor === correcta){
+
+          correctas++;
+
+        }else{
+
+          errores += `
+
+            <li>
+
+              <strong>
+                Pregunta ${index + 1}
+              </strong>
+
+              <br>
+
+              Correcta:
+              <strong>
+                ${correcta}
+              </strong>
+
+            </li>
+          `;
+        }
+      }
+    );
+
+    const total =
+      preguntas.length;
+
+    const porcentaje =
+      (
+        (correctas / total) * 100
+      ).toFixed(1);
+
+    document.getElementById(
+      "resultado"
+    ).innerHTML = `
+
+      <h5>
+        Resultado
+      </h5>
+
+      <p>
+
+        <strong>
+          Calificación:
+        </strong>
+
+        ${correctas}
+        /
+        ${total}
+
+        (${porcentaje}%)
+
+      </p>
+
+      ${
+        errores
+        ?
+        `
+          <h6>
+            Incorrectas
+          </h6>
+
+          <ul>
+            ${errores}
+          </ul>
+        `
+        :
+        `
+          <h6 style="color:#81c784;">
+            ¡Perfecto! 🎉
+          </h6>
+        `
+      }
+    `;
+  }
+
+  // ======================================
+  // REINICIAR
+  // ======================================
+
+  function reiniciar(){
+
+    generar();
+
+    document
+      .querySelectorAll(
+        ".input-letter"
+      )
+      .forEach(
+        input => input.value = ""
+      );
+
+    actualizarIncisosUsados();
+  }
+
+  generar();
+
+</script>
+
+</body>
+</html>
